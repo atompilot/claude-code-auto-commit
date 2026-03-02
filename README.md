@@ -7,10 +7,12 @@ One-command git workflow for [Claude Code](https://docs.anthropic.com/en/docs/cl
 ## Features
 
 - **Auto-stage** — `git add -A` all changes automatically
+- **Sensitive file detection** — warns before staging `.env`, `*.pem`, `*.key`, credentials, and other secrets
 - **Smart commit messages** — analyzes your diff and generates [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `refactor:`, etc.)
 - **Adapts to your style** — reads recent commit history and matches the language & conventions of your project
+- **Respects CLAUDE.md** — if your project defines commit conventions in `CLAUDE.md`, those take priority
 - **Semantic versioning** — optional automatic version bumping via `VERSION` file (major/minor/patch)
-- **Push in one step** — commits and pushes to origin with helpful error messages on failure
+- **Push in one step** — commits and pushes to origin with helpful error messages on failure (or skip with `--no-push`)
 - **Context pre-fetching** — uses Claude Code's `!` backtick syntax to gather git context before execution
 
 ## Quick Install
@@ -46,23 +48,25 @@ In Claude Code, type:
 ```
 
 That's it. Claude will:
-1. Stage all changes
-2. Analyze the diff
-3. Generate a conventional commit message
-4. Bump the version (if `VERSION` file exists)
-5. Commit and push
+1. Check for sensitive files (`.env`, keys, credentials)
+2. Stage all changes
+3. Analyze the diff
+4. Generate a conventional commit message (respecting `CLAUDE.md` conventions if present)
+5. Bump the version (if `VERSION` file exists)
+6. Commit and push
 
 ### Version Bump Control
 
 If your project has a `VERSION` file in the root, the version is bumped automatically based on the commit type. You can also force a specific bump level:
 
 ```
-/auto-commit --major    # Breaking changes: 1.2.3 → 2.0.0
-/auto-commit --minor    # New features:     1.2.3 → 1.3.0
-/auto-commit --patch    # Bug fixes:        1.2.3 → 1.2.4
+/auto-commit --major      # Breaking changes: 1.2.3 → 2.0.0
+/auto-commit --minor      # New features:     1.2.3 → 1.3.0
+/auto-commit --patch      # Bug fixes:        1.2.3 → 1.2.4
+/auto-commit --no-push    # Commit only, do not push
 ```
 
-No `VERSION` file? No problem — versioning is skipped entirely.
+No `VERSION` file? No problem — versioning is skipped entirely. Flags can be combined: `/auto-commit --minor --no-push`.
 
 ### Commit Types
 

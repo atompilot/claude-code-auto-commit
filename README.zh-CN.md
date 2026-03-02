@@ -7,10 +7,12 @@
 ## 特性
 
 - **自动暂存** — 自动执行 `git add -A` 暂存所有变更
+- **敏感文件检测** — 在暂存前检查 `.env`、`*.pem`、`*.key`、凭证等敏感文件，发现后警告用户
 - **智能 commit 消息** — 分析 diff 内容，生成 [Conventional Commits](https://www.conventionalcommits.org/) 格式的提交信息（`feat:`、`fix:`、`refactor:` 等）
 - **适配项目风格** — 读取最近的 commit 历史，自动匹配项目的语言和提交规范
+- **尊重 CLAUDE.md** — 如果项目 `CLAUDE.md` 中定义了 commit 规范，优先遵循项目规范
 - **语义化版本管理** — 通过 `VERSION` 文件自动管理版本号（major/minor/patch），可选功能
-- **一步推送** — 提交后自动 push 到 origin，失败时给出友好的错误提示
+- **一步推送** — 提交后自动 push 到 origin，失败时给出友好的错误提示（可用 `--no-push` 跳过）
 - **上下文预获取** — 使用 Claude Code 的 `!` 反引号语法在执行前收集 git 上下文
 
 ## 快速安装
@@ -46,23 +48,25 @@ cp commands/auto-commit.md ~/.claude/commands/auto-commit.md
 ```
 
 就这样。Claude 会自动：
-1. 暂存所有变更
-2. 分析 diff 内容
-3. 生成规范化 commit 消息
-4. 更新版本号（如果存在 `VERSION` 文件）
-5. 提交并推送
+1. 检查敏感文件（`.env`、密钥、凭证等）
+2. 暂存所有变更
+3. 分析 diff 内容
+4. 生成规范化 commit 消息（如果 `CLAUDE.md` 中有定义则优先遵循）
+5. 更新版本号（如果存在 `VERSION` 文件）
+6. 提交并推送
 
 ### 版本号控制
 
 如果项目根目录有 `VERSION` 文件，版本号会根据 commit 类型自动递增。也可以强制指定递增级别：
 
 ```
-/auto-commit --major    # 破坏性变更: 1.2.3 → 2.0.0
-/auto-commit --minor    # 新功能:     1.2.3 → 1.3.0
-/auto-commit --patch    # Bug 修复:   1.2.3 → 1.2.4
+/auto-commit --major      # 破坏性变更: 1.2.3 → 2.0.0
+/auto-commit --minor      # 新功能:     1.2.3 → 1.3.0
+/auto-commit --patch      # Bug 修复:   1.2.3 → 1.2.4
+/auto-commit --no-push    # 仅提交，不推送
 ```
 
-没有 `VERSION` 文件？没关系 — 版本管理步骤会被完全跳过。
+没有 `VERSION` 文件？没关系 — 版本管理步骤会被完全跳过。参数可以组合使用：`/auto-commit --minor --no-push`。
 
 ### Commit 类型
 
