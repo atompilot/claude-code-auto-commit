@@ -1,0 +1,91 @@
+---
+allowed-tools: Bash(git add:*), Bash(git status:*), Bash(git diff:*), Bash(git commit:*), Bash(git push:*), Bash(git log:*), Bash(git branch:*), Bash(git rev-parse:*), Bash(cat VERSION), Bash(echo * > VERSION), Read, Edit
+description: Auto-stage, generate conventional commit message, optional semantic versioning, and push
+---
+
+## Context
+
+- Current git status: !`git status`
+- Staged and unstaged changes: !`git diff HEAD`
+- Current branch: !`git branch --show-current`
+- Recent commits (for style reference): !`git log --oneline -10`
+
+## Your Task
+
+Perform a complete git commit workflow. Follow the steps below **exactly in order**. Use tool calls only — do not output conversational text.
+
+### Step 1: Validate Environment
+
+- Confirm this is a git repository (the context above should show git info; if it shows errors, stop and inform the user).
+- If `git status` shows "nothing to commit, working tree clean", stop and inform the user there is nothing to commit.
+
+### Step 2: Stage All Changes
+
+Run `git add -A` to stage all changes (new, modified, deleted files).
+
+### Step 3: Analyze Changes
+
+Run `git diff --cached --stat` and `git diff --cached` to understand what changed. Determine:
+
+1. **Commit type** — choose the most appropriate:
+   - `feat`: new feature or capability
+   - `fix`: bug fix
+   - `refactor`: code restructuring without behavior change
+   - `docs`: documentation only
+   - `style`: formatting, whitespace, semicolons (no logic change)
+   - `test`: adding or updating tests
+   - `chore`: build, CI, dependencies, tooling
+   - `perf`: performance improvement
+
+2. **Commit subject** — a concise summary (≤72 chars) in imperative mood ("add X" not "added X"). Write the subject in the language matching the repository's existing commit history (check the recent commits from context). If no prior commits exist, use English.
+
+3. **Commit body** (optional) — if the change is complex, add bullet points explaining the key changes.
+
+### Step 4: Semantic Versioning (Optional)
+
+Check if a `VERSION` file exists in the project root.
+
+- **If VERSION exists**, read it and bump the version:
+  - **major** (X.0.0): breaking changes, core architecture rewrites, incompatible API changes
+  - **minor** (x.Y.0): `feat` type commits, new files/modules added
+  - **patch** (x.y.Z): `fix`, `refactor`, `docs`, `style`, `test`, `chore`, `perf`
+  - User may pass `$ARGUMENTS` with `--major`, `--minor`, or `--patch` to force a specific bump level.
+  - Write the new version back to `VERSION` and stage it with `git add VERSION`.
+
+- **If VERSION does not exist**, skip this step entirely.
+
+### Step 5: Create the Commit
+
+Format the commit message:
+
+**If VERSION was updated:**
+```
+<type>: <subject> (v<new_version>)
+
+[optional body]
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+**If no VERSION file:**
+```
+<type>: <subject>
+
+[optional body]
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+Create the commit using `git commit -m "$(cat <<'EOF'
+<full commit message>
+EOF
+)"`.
+
+### Step 6: Push to Remote
+
+Run `git push origin <current_branch>`.
+
+- If push succeeds, report success.
+- If push fails due to remote changes, suggest `git pull --rebase origin <branch>` first.
+- If push fails due to no upstream, suggest `git push -u origin <branch>`.
+- If there is no remote configured, just report the commit was created locally.

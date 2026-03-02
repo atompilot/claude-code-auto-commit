@@ -1,0 +1,12 @@
+{
+  "name": "claude-code-auto-commit",
+  "version": "1.0.0",
+  "description": "One-command git workflow: auto-stage, conventional commit messages, optional semantic versioning, and push",
+  "author": {
+    "name": "atompilot"
+  },
+  "homepage": "https://github.com/atompilot/claude-code-auto-commit",
+  "repository": "https://github.com/atompilot/claude-code-auto-commit",
+  "license": "MIT",
+  "keywords": ["git", "auto-commit", "conventional-commits", "semantic-versioning"]
+}
