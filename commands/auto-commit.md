@@ -25,10 +25,24 @@ You MUST do all of the above in a single message with only tool calls. Do not us
 ### Step 2: Safety Check
 
 Before staging, check `git status` output for potentially sensitive files:
-- `.env`, `.env.*`
-- `*.pem`, `*.key`, `*.p12`, `*.pfx`
+
+**Environment & config:**
+- `.env`, `.env.*` (but NOT `.env.example`)
+- `*config*secret*`, `*config*password*`
+
+**Private keys & certificates:**
+- `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.p8`
+- `*.cert`, `*.crt`, `*.jks`, `*.keystore`
+- `id_rsa`, `id_ed25519`, `id_dsa`, `id_ecdsa`
+
+**Credential & token files:**
 - `*credentials*`, `*secret*`, `*token*`
-- `id_rsa`, `id_ed25519`
+- `*password*`, `*passwd*`
+- `serviceAccountKey.json`, `*service-account*.json`
+
+**Mobile / cloud platform secrets:**
+- `google-services.json`, `GoogleService-Info.plist`
+- `*firebase*key*`, `*firebase*secret*`
 
 If any untracked or modified files match these patterns, **stop and warn the user**. List the suspicious files and ask whether to proceed. Do NOT stage or commit them automatically.
 
